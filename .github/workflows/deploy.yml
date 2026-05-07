@@ -1,0 +1,29 @@
+name: Deploy Resume to AWS
+
+on:
+  push:
+    branches: [ main ]   # Most repos use "main" now
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AKIAZQ3DQ7MID2R6SHJV }}
+          aws-secret-access-key: ${{ secrets.VWYXAqJhzFL/4nw/RCnzT1yS7Ga4ERn5GvIBjrGZ }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        run: aws s3 sync . s3://nicholas-moline-resume-2026 --delete
+
+      - name: Invalidate CloudFront Cache
+        run: aws cloudfront create-invalidation --distribution-id E3026UA4XV0ZS1 --paths "/*"
